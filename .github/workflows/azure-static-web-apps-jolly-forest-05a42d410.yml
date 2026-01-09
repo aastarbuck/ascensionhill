@@ -15,13 +15,20 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     permissions:
-       id-token: write
-       contents: read
+      id-token: write
+      contents: read
+
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true
           lfs: false
+
+      - name: Install Hugo Extended
+        run: |
+          wget https://github.com/gohugoio/hugo/releases/download/v0.125.4/hugo_extended_0.125.4_Linux-64bit.tar.gz
+          tar -xzf hugo_extended_0.125.4_Linux-64bit.tar.gz
+          sudo mv hugo /usr/local/bin/hugo
 
       - name: Install OIDC Client from Core Package
         run: npm install @actions/core@1.6.0 @actions/http-client
@@ -30,10 +37,10 @@ jobs:
         uses: actions/github-script@v6
         id: idtoken
         with:
-           script: |
-               const coredemo = require('@actions/core')
-               return await coredemo.getIDToken()
-           result-encoding: string
+          script: |
+            const coredemo = require('@actions/core')
+            return await coredemo.getIDToken()
+          result-encoding: string
 
       - name: Build And Deploy
         id: builddeploy
@@ -46,7 +53,7 @@ jobs:
           app_location: "/"                 # Hugo project root
           api_location: ""                  # No API
           output_location: "public"         # Hugo output folder
-          app_artifact_location: "public"   # ⭐ REQUIRED for Hugo deployments
+          app_artifact_location: "public"   # Required for Azure to find the built site
           app_build_command: "hugo --minify"
           github_id_token: ${{ steps.idtoken.outputs.result }}
           ###### End of Repository/Build Configurations ######
