@@ -1,36 +1,38 @@
+
 name: Azure Static Web Apps CI/CD
 
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
-      - master
+      - main
 
 jobs:
   build_and_deploy_job:
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
     steps:
-      - name: Checkout repository
+      - name: Checkout repository (with submodules)
         uses: actions/checkout@v4
-
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v2
         with:
-          hugo-version: 'latest'
-          extended: true
+          submodules: true
+          fetch-depth: 0
 
-      - name: Build Hugo site
-        run: hugo --minify
-
-      - name: Deploy to Azure Static Web Apps
+      - name: Build and Deploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_POLITE_FOREST_0A8C17610 }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
+
+          # Hugo site root
           app_location: "/"
+
+          # Hugo’s output folder
           output_location: "public"
+
+          # Explicit Hugo build
+          app_build_command: "hugo --minify"
