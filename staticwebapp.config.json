@@ -1,0 +1,12 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*", "/images/*", "/css/*", "/js/*"]
+  },
+  "routes": [
+    {
+      "route": "/*",
+      "redirect": "https://ascensionhill.net{path}",
+      "statusCode": 301,
+      "allowedRoles": ["anonymous"],
+     
