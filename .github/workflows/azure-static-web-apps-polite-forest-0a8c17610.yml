@@ -1,53 +1,36 @@
-
 name: Azure Static Web Apps CI/CD
 
 on:
   push:
     branches:
-      - master     # <-- change to "main" if your default branch is main
+      - master
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
-      - master     # <-- change to "main" if your default branch is main
+      - master
 
 jobs:
   build_and_deploy_job:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
-
     steps:
-      # Ensure the Relearn theme submodule is available during build
-      - name: Checkout repository (with submodules)
+      - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: true
-          fetch-depth: 0
 
-      # Install Hugo Extended (sets up the correct binary for SCSS, required by Relearn)
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: 'latest'
           extended: true
 
-      # Build Hugo site to ./public (default for Hugo)
       - name: Build Hugo site
         run: hugo --minify
 
-      # Deploy to Azure Static Web Apps (pinned to a commit SHA for reproducibility)
       - name: Deploy to Azure Static Web Apps
-        uses: Azure/static-web-apps-deploy@1a947af9992250f3bc2e68ad0754c0b0c11566c9
+        uses: Azure/static-web-apps-deploy@v1
         with:
-          # Use the exact secret name you already created in your repo settings
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_POLITE_FOREST_0A8C17610 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-
-          # Hugo site root (where hugo.toml lives)
           app_location: "/"
-
-          # Folder to serve (Hugo output)
           output_location: "public"
-
-          # We already built above; tell SWA to skip its own build (avoids Oryx mismatches)
-          skip_app_build: true
