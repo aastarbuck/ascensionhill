@@ -33,4 +33,4 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           app_location: "/"
-          output_location: "public"
+          output_location: ""
