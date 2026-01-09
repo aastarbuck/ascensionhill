@@ -43,10 +43,11 @@ jobs:
           action: "upload"
 
           ###### Repository/Build Configurations ######
-          app_location: "/"          # App source code path
-          api_location: ""           # No API
-          output_location: "public"  # Hugo output folder
-          app_build_command: "hugo --minify"   # ⭐ REQUIRED FOR HUGO
+          app_location: "/"                 # Hugo project root
+          api_location: ""                  # No API
+          output_location: "public"         # Hugo output folder
+          app_artifact_location: "public"   # ⭐ REQUIRED for Hugo deployments
+          app_build_command: "hugo --minify"
           github_id_token: ${{ steps.idtoken.outputs.result }}
           ###### End of Repository/Build Configurations ######
 
