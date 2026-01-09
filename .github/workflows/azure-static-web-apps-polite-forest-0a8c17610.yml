@@ -3,52 +3,51 @@ name: Azure Static Web Apps CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - master   # <-- change to "main" if your default branch is main
   pull_request:
-    types: [ opened, synchronize, reopened, closed ]
-    branches: [ main ]
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - master   # <-- likewise here, use your real default branch
 
 jobs:
-  build_and_deploy:
-    if: github.event_name == 'push' || github.event.pull_request.merged == true
+  build_and_deploy_job:
     runs-on: ubuntu-latest
+    name: Build and Deploy Job
 
     steps:
-      # 1) Checkout repo WITH submodules so the Relearn theme is present
+      # Ensure the Relearn theme submodule is available during build
       - name: Checkout repository (with submodules)
         uses: actions/checkout@v4
         with:
           submodules: true
           fetch-depth: 0
 
-      # 2) Install Hugo Extended (explicit + deterministic)
-      #    Relearn requires Hugo extended; we’ll pin a recent stable version.
-      - name: Install Hugo Extended
-        run: |
-          HUGO_VERSION=0.124.1
-          wget -q https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.tar.gz
-          tar -xzf hugo_extended_${HUGO_VERSION}_Linux-64bit.tar.gz hugo
-          sudo mv hugo /usr/local/bin/hugo
-          hugo version
+      # Install Hugo Extended (peaceiris sets up the correct binary)
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: 'latest'
+          extended: true
 
-      # 3) Build the site (outputs to ./public by default)
+      # Build Hugo site to ./public (default)
       - name: Build Hugo site
-        run: |
-          hugo --minify
+        run: hugo --minify
 
-      # 4) Deploy to Azure Static Web Apps (PINNED to a commit SHA)
+      # Deploy to Azure Static Web Apps
+      # Pinned to a commit SHA for reproducibility (recommended by GitHub)
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@1a947af9992250f3bc2e68ad0754c0b0c11566c9
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_POLITE_FOREST_0A8C17610 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
 
-          # Your Hugo site root (where hugo.toml lives)
+          # Hugo site root (where hugo.toml lives)
           app_location: "/"
 
-          # The folder to serve (Hugo’s output)
+          # Folder to serve (Hugo output)
           output_location: "public"
 
-          # We already built above; skip Oryx’s app build to avoid double builds
+          # We already built above; skip Oryx's app build
           skip_app_build: true
