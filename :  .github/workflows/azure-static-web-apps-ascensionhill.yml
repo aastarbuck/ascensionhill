@@ -4,36 +4,30 @@ on:
   push:
     branches:
       - master
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
-    branches:
-      - master
 
 jobs:
-  build_and_deploy_job:
+  build_and_deploy:
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          submodules: true
+        uses: actions/checkout@v4
 
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v2
-        with:
-          hugo-version: '0.141.0'
-          extended: true
+      - name: Install Hugo 0.141.0 Extended
+        run: |
+          wget https://github.com/gohugoio/hugo/releases/download/v0.141.0/hugo_extended_0.141.0_Linux-64bit.tar.gz
+          tar -xzf hugo_extended_0.141.0_Linux-64bit.tar.gz
+          sudo mv hugo /usr/local/bin/hugo
+          hugo version
 
-      - name: Build with Hugo
+      - name: Build Hugo site
         run: hugo --minify
 
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: "d9e20e772936d6f7f9c70c687b13c805159c0ae5ceb17e57164fd568cfe70d0f01-98a5103b-281a-4376-9066-542b324e918f01020290b1e2b510"
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ASHY_CLIFF_09C974610 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          
-          action: "upload"
+          action: upload
           app_location: "/"
           output_location: "public"
