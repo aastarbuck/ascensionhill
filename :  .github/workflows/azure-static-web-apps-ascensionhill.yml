@@ -33,6 +33,7 @@ jobs:
         with:
           azure_static_web_apps_api_token: "d9e20e772936d6f7f9c70c687b13c805159c0ae5ceb17e57164fd568cfe70d0f01-98a5103b-281a-4376-9066-542b324e918f01020290b1e2b510"
           repo_token: ${{ secrets.GITHUB_TOKEN }}
+          
           action: "upload"
           app_location: "/"
           output_location: "public"
